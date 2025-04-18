@@ -1,8 +1,6 @@
-// Create a hook to load and process CSV data
 import { useState, useEffect } from "react";
 import Papa from "papaparse";
 
-// Define an interface for your data structure
 interface CSVRow {
   [key: string]: string | number | boolean | null;
 }
@@ -21,7 +19,6 @@ export function App() {
                 console.log(result);
                 setData(result.data as CSVRow[]);
                 console.log(result.data[324]);
-                // Removed console.log(data) to avoid dependency issues
                 setLoading(false);
             })
             .catch((err) => {
