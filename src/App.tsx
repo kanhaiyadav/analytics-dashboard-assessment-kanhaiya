@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// Create a hook to load and process CSV data
+import { useState, useEffect } from "react";
+import Papa from "papaparse";
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+// Define an interface for your data structure
+interface CSVRow {
+  [key: string]: string | number | boolean | null;
 }
 
-export default App
+export function App() {
+    const [data, setData] = useState<CSVRow[]>([]);
+    const [loading, setLoading] = useState(true);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [error, setError] = useState<Error | null>(null);
+
+    useEffect(() => {
+        fetch("/data.csv")
+            .then((response) => response.text())
+            .then((csvString) => {
+                const result = Papa.parse(csvString, { header: true });
+                console.log(result);
+                setData(result.data as CSVRow[]);
+                console.log(result.data[324]);
+                // Removed console.log(data) to avoid dependency issues
+                setLoading(false);
+            })
+            .catch((err) => {
+                setError(err);
+                setLoading(false);
+            });
+    }, []);
+
+    return (
+        <div>
+            <h1>Hello</h1>
+            {loading && <p>Loading...</p>}
+            <div className="text-green-500">
+                {JSON.stringify(data)}
+            </div>
+        </div>
+    );
+}
