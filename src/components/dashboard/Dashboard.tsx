@@ -1,9 +1,12 @@
 import { useEVDashboard } from "../../hooks/useEVDashboard";
 import { Skeleton } from "../ui/skeleton";
+import { MakePieChart } from "../charts/MakePieChart";
 import { MakeDistributionChart } from "../charts/MakeDistributionChart";
 import { MakeVerticalDistributionChart } from "../charts/MakeVerticalDistributionChart";
 import StatsCard from "./StatsCard";
 import { BatteryIcon, BoltIcon, CarIcon, FactoryIcon } from "lucide-react";
+import { MakeMultipleBarChart } from "../charts/MakeMultipleBarChart";
+import { StackedAreaChart } from "../charts/StackedAreaChart";
 
 export function Dashboard() {
     const { loading, error, analytics, isReady } = useEVDashboard();
@@ -35,7 +38,6 @@ export function Dashboard() {
     return (
         <div className="grow h-full overflow-y-auto">
             <div className="space-y-6 w-full h-fit p-4 pl-0">
-
                 <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
                     <StatsCard
                         title="Total EVs"
@@ -88,6 +90,58 @@ export function Dashboard() {
                         formatter={(value) => `${value} vehicles`}
                         interval={1}
                         labelFormatter={(label) => `Range: ${label} miles`}
+                    />
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-4">
+                    <MakePieChart
+                        data={analytics.vehicleTypeData || []}
+                        nameKey="name"
+                        dataKey="value"
+                        title="Vehicle Type Distribution"
+                        formatter={(value) => `Count: ${value} vehicles`}
+                        labelFormatter={(label) => `Vehicle Type: ${label}`}
+                    />
+                    <MakePieChart
+                        data={analytics.modelDistribution || []}
+                        nameKey="name"
+                        dataKey="value"
+                        title="Make-model Distribution"
+                        formatter={(value) => `Count: ${value} vehicles`}
+                        labelFormatter={(label) => `${label}`}
+                    />
+                    <MakePieChart
+                        data={analytics.cafvDistribution || []}
+                        nameKey="status"
+                        dataKey="count"
+                        title="csfv Distribution"
+                        formatter={(value) => `Count: ${value} vehicles`}
+                        labelFormatter={(label) => `Status: ${label}`}
+                    />
+                    <MakePieChart
+                        data={analytics.utilityDistribution || []}
+                        nameKey="utility"
+                        dataKey="count"
+                        title="Utility Distribution"
+                        formatter={(value) => `Count: ${value} vehicles`}
+                        labelFormatter={(label) => `Utility: ${label}`}
+                    />
+                </div>
+
+                <div className="flex gap-6">
+                    <MakeMultipleBarChart
+                        data={analytics.vehicleTypeRangeDistribution || []}
+                        title="Vehicle Type Range Comparison"
+                        dataKey1="bev"
+                        dataKey2="phev"
+                        nameKey="range"
+                    />
+                    <StackedAreaChart
+                        data={analytics.vehicleTypeYearDistribution || []}
+                        title="Vehicle Type Year Distribution"
+                        dataKey1="bev"
+                        dataKey2="phev"
+                        nameKey="year"
                     />
                 </div>
             </div>
