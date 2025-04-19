@@ -39,6 +39,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --shadow-card: 0 2px 5px 2px rgba(0, 0, 0, 0.8);
 }
 
 :root {
@@ -53,8 +54,8 @@
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.39 0.03 299.34);
+  --muted: oklch(0.39 0.03 299.34);
+  --muted-foreground: rgb(134 139 147);
   --accent: oklch(0.35 0.04 299.75);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
@@ -66,6 +67,9 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+  --chart-6: oklch(0.627 0.265 303.9);
+  --chart-7: oklch(0.645 0.246 16.439);
+  --chart-8: oklch(0.488 0.243 264.376);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -118,4 +122,13 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.glass{
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border:1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
