@@ -1,5 +1,7 @@
 import { useEVDashboard } from "../../hooks/useEVDashboard";
 import { Skeleton } from "../ui/skeleton";
+import { MakeDistributionChart } from "../charts/MakeDistributionChart";
+import { MakeVerticalDistributionChart } from "../charts/MakeVerticalDistributionChart";
 import StatsCard from "./StatsCard";
 import { BatteryIcon, BoltIcon, CarIcon, FactoryIcon } from "lucide-react";
 
@@ -33,7 +35,7 @@ export function Dashboard() {
     return (
         <div className="grow h-full overflow-y-auto">
             <div className="space-y-6 w-full h-fit p-4 pl-0">
-                {/* Key Stats */}
+
                 <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
                     <StatsCard
                         title="Total EVs"
@@ -51,20 +53,43 @@ export function Dashboard() {
                     />
                     <StatsCard
                         title="BEV Range"
-                        value={`${analytics.vehicleTypeRangeComparison.bev} miles`}
+                        value={`${analytics.vehicleTypeRangeComparison?.bev} miles`}
                         icon={
                             <BoltIcon className="text-xl text-muted-foreground" />
                         }
                     />
                     <StatsCard
                         title="Top Manufacturer"
-                        value={analytics.makeDistribution[0]?.name || "N/A"}
+                        value={analytics.makeDistribution?.[0]?.name || "N/A"}
                         icon={
                             <FactoryIcon className="text-xl text-muted-foreground" />
                         }
                     />
                 </div>
 
+                <div className="grid gap-6 md:grid-cols-3">
+                    <MakeDistributionChart
+                        title="County Distribution"
+                        data={analytics.countyDistribution?.slice(0, 7) || []}
+                        xDataKey="county"
+                        yDataKey="count"
+                        formatter={(value) => `${value} vehicles`}
+                        labelFormatter={(label) => `County: ${label}`}
+                        interval={0}
+                    />
+                    <MakeVerticalDistributionChart
+                        data={analytics.makeDistribution?.slice(0, 10) || []}
+                    />
+                    <MakeDistributionChart
+                        title="Battery Range Distribution"
+                        data={analytics.rangeDistribution || []}
+                        xDataKey="range"
+                        yDataKey="count"
+                        formatter={(value) => `${value} vehicles`}
+                        interval={1}
+                        labelFormatter={(label) => `Range: ${label} miles`}
+                    />
+                </div>
             </div>
         </div>
     );

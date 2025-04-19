@@ -35,10 +35,12 @@ export function useEVAnalytics(data: EVData[]) {
             return acc;
         }, {} as Record<string, number>);
         const vehicleTypeData = Object.entries(vehicleTypeCounts).map(
-            ([name, value]) => ({
+            ([name, value], index) => ({
+                label: name,
                 name,
                 value,
                 percentage: ((value / data.length) * 100).toFixed(1) + "%",
+                fill: `var(--chart-${(index % 8) + 1})`,
             })
         );
 
@@ -67,10 +69,12 @@ export function useEVAnalytics(data: EVData[]) {
         }, {} as Record<string, number>);
 
         const modelDistribution = Object.entries(modelData)
-            .map(([name, value]) => ({
+            .map(([name, value], index) => ({
+                label: name,
                 name,
                 value,
                 percentage: ((value / data.length) * 100).toFixed(1) + "%",
+                fill: `var(--chart-${(index % 8) + 1})`,
             }))
             .sort((a, b) => b.value - a.value)
             .slice(0, 10);
@@ -111,13 +115,15 @@ export function useEVAnalytics(data: EVData[]) {
 
             acc.push({
                 range: `${min}-${max}`,
+                label: `${min} - ${max}`,
                 count,
                 percentage:
                     ((count / validRangeData.length) * 100).toFixed(1) + "%",
+                fill: `var(--chart-${(index % 8) + 1})`,
             });
 
             return acc;
-        }, [] as Array<{ range: string; count: number; percentage: string }>);
+        }, [] as Array<{ range: string; label: string; count: number; percentage: string, fill: string}>);
 
 
         
@@ -150,10 +156,12 @@ export function useEVAnalytics(data: EVData[]) {
         }, {} as Record<string, number>);
 
         const cafvDistribution = Object.entries(cafvData).map(
-            ([status, count]) => ({
+            ([status, count], index) => ({
+                label: status,
                 status,
                 count,
                 percentage: ((count / data.length) * 100).toFixed(1) + "%",
+                fill: `var(--chart-${(index % 8) + 1})`,
             })
         );
 
@@ -168,10 +176,12 @@ export function useEVAnalytics(data: EVData[]) {
         }, {} as Record<string, number>);
 
         const countyDistribution = Object.entries(countyData)
-            .map(([county, count]) => ({
+            .map(([county, count], index) => ({
                 county,
+                label: 'county',
                 count,
                 percentage: ((count / data.length) * 100).toFixed(1) + "%",
+                fill: `var(--chart-${(index % 8) + 1})`,
             }))
             .sort((a, b) => b.count - a.count);
 
@@ -196,10 +206,12 @@ export function useEVAnalytics(data: EVData[]) {
         }, {} as Record<string, number>);
 
         const utilityDistribution = Object.entries(utilityData)
-            .map(([utility, count]) => ({
+            .map(([utility, count], index) => ({
+                label: utility,
                 utility,
                 count,
                 percentage: ((count / data.length) * 100).toFixed(1) + "%",
+                fill: `var(--chart-${(index % 8) + 1})`,
             }))
             .sort((a, b) => b.count - a.count);
         
@@ -270,6 +282,40 @@ export function useEVAnalytics(data: EVData[]) {
 
 
             
+            
+        const keyInsights = [
+            `${
+                makeDistribution[0]?.name || "Unknown"
+            } is the most popular EV manufacturer with ${
+                makeDistribution[0]?.percentage || "0%"
+            } market share.`,
+            `${
+                modelDistribution[0]?.name || "Unknown"
+            } is the most common EV model.`,
+            `The average electric range is ${Math.round(averageRange)} miles.`,
+            `Battery Electric Vehicles average ${Math.round(
+                bevAvgRange
+            )} miles of range, while PHEVs average ${Math.round(
+                phevAvgRange
+            )} miles.`,
+            `${
+                cafvDistribution.find((d) => d.status.includes("Eligible"))
+                    ?.percentage || "0%"
+            } of vehicles are eligible for Clean Alternative Fuel Vehicle benefits.`,
+            `${
+                countyDistribution[0]?.county || "Unknown"
+            } County has the highest EV concentration with ${
+                countyDistribution[0]?.percentage || "0%"
+            } of all EVs.`,
+            `${
+                yearDistribution[yearDistribution.length - 1]?.count || 0
+            } new EVs were registered in ${
+                yearDistribution[yearDistribution.length - 1]?.year ||
+                "the most recent year"
+            }.`,
+        ];
+
+        
         
         return {
             isReady: true,
@@ -289,6 +335,7 @@ export function useEVAnalytics(data: EVData[]) {
                 bev: Math.round(bevAvgRange),
                 phev: Math.round(phevAvgRange),
             },
+            keyInsights,
         };
     }, [data]);
 }
