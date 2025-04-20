@@ -440,12 +440,6 @@ export function useEVAnalytics(data: EVData[]) {
             } County has the highest EV concentration with ${
                 countyDistribution[0]?.percentage || "0%"
             } of all EVs.`,
-            `${
-                yearDistribution[yearDistribution.length - 1]?.count || 0
-            } new EVs were registered in ${
-                yearDistribution[yearDistribution.length - 1]?.year ||
-                "the most recent year"
-            }.`,
         ];
 
         interface EVFilters {
