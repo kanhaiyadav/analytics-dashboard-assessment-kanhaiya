@@ -4,6 +4,8 @@ import { useEVDashboard } from "@/hooks/useEVDashboard";
 import { EVData } from "@/lib/dataAnalysis";
 import DataTable from "./DataTable";
 import { Skeleton } from "../ui/skeleton";
+import Stats from "./Stats";
+import { StatsProps } from "./Stats";
 
 interface EVFilters {
     vin?: string;
@@ -445,9 +447,90 @@ const columns = [
     "2020 Census Tract",
 ];
 
+function calculateEVStatistics(filteredData: EVData[]) {
+    const totalVehicles = filteredData.length;
+    let totalRange = 0;
+    let validRangeCount = 0;
+
+    let bevVehicles = 0;
+    let bevTotalRange = 0;
+    let bevValidRangeCount = 0;
+
+    let phevVehicles = 0;
+    let phevTotalRange = 0;
+    let phevValidRangeCount = 0;
+
+    let cafvEligibleCount = 0;
+    let cafvNonEligibleCount = 0;
+
+    filteredData.forEach((vehicle: EVData) => {
+        const range = parseInt(vehicle["Electric Range"]) || 0;
+        const vehicleType = vehicle["Electric Vehicle Type"];
+        const cafvStatus =
+            vehicle["Clean Alternative Fuel Vehicle (CAFV) Eligibility"];
+
+        if (cafvStatus.includes("Eligible")) {
+            cafvEligibleCount++;
+        } else {
+            cafvNonEligibleCount++;
+        }
+
+        if (range > 0) {
+            totalRange += range;
+            validRangeCount++;
+        }
+
+        if (vehicleType === "Battery Electric Vehicle (BEV)") {
+            bevVehicles++;
+            if (range > 0) {
+                bevTotalRange += range;
+                bevValidRangeCount++;
+            }
+        }
+
+        if (vehicleType === "Plug-in Hybrid Electric Vehicle (PHEV)") {
+            phevVehicles++;
+            if (range > 0) {
+                phevTotalRange += range;
+                phevValidRangeCount++;
+            }
+        }
+    });
+
+    const averageRange = validRangeCount > 0 ? totalRange / validRangeCount : 0;
+    const averageBEVRange =
+        bevValidRangeCount > 0 ? bevTotalRange / bevValidRangeCount : 0;
+    const averagePHEVRange =
+        phevValidRangeCount > 0 ? phevTotalRange / phevValidRangeCount : 0;
+
+    return {
+        totalVehicles,
+        averageRange: parseFloat(averageRange.toFixed(1)),
+        bevStatistics: {
+            totalVehicles: bevVehicles,
+            averageRange: parseFloat(averageBEVRange.toFixed(1)),
+        },
+        phevStatistics: {
+            totalVehicles: phevVehicles,
+            averageRange: parseFloat(averagePHEVRange.toFixed(1)),
+        },
+        cafvStatistics: {
+            eligibleCount: cafvEligibleCount,
+            nonEligibleCount: cafvNonEligibleCount,
+            eligibilityRate:
+                totalVehicles > 0
+                    ? parseFloat(
+                          ((cafvEligibleCount / totalVehicles) * 100).toFixed(1)
+                      )
+                    : 0,
+        },
+    };
+}
+
 const Overview = () => {
     const { loading, analytics } = useEVDashboard();
     const [records, setRecords] = useState<EVData[]>();
+    const [stats, setStats] = useState<StatsProps>();
 
     const [filter, setFilter] = React.useState<EVFilters>({} as EVFilters);
 
@@ -460,7 +543,8 @@ const Overview = () => {
         if (analytics && analytics.filterEVData) {
             const filteredRecords = analytics.filterEVData(filter);
             setRecords(filteredRecords);
-
+            const result = calculateEVStatistics(filteredRecords);
+            setStats(result);
         }
     }, [filter, analytics]);
 
@@ -475,19 +559,79 @@ const Overview = () => {
                         placeholder={dropdown.name}
                     />
                 ))}
+                <form
+                    className="flex flex-col gap-2 form glass"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        const form = e.target as HTMLFormElement;
+                        changeFilter(
+                            "rangeMin",
+                            (form.elements[0] as HTMLInputElement).value
+                        );
+                    }}
+                >
+                    <input
+                        type={"number"}
+                        placeholder="Range Min"
+                        className="input"
+                    />
+                </form>
+                <form
+                    className="flex flex-col gap-2 form glass"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        const form = e.target as HTMLFormElement;
+                        changeFilter(
+                            "rangeMax",
+                            (form.elements[0] as HTMLInputElement).value
+                        );
+                    }}
+                >
+                    <input
+                        type={"number"}
+                        placeholder="Range Max"
+                        className="input"
+                    />
+                </form>
+                <form
+                    className="flex flex-col gap-2 form glass"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        const form = e.target as HTMLFormElement;
+                        changeFilter(
+                            "vin",
+                            (form.elements[0] as HTMLInputElement).value
+                        );
+                    }}
+                >
+                    <input
+                        type={"text"}
+                        placeholder="VIN (1-10)"
+                        className="input"
+                    />
+                </form>
+
+                <button
+                    className="glass px-9 py-1"
+                    onClick={() => {
+                        setFilter({} as EVFilters);
+                        setRecords([]);
+                        setStats(undefined);
+                    }}
+                >
+                    Reset
+                </button>
             </div>
             {loading ? (
                 <div className="max-h-[60vh] overflow-y-auto w-full overflow-x-auto styled-scrollbar">
                     <div className="flex flex-col gap-1 w-full">
                         <Skeleton className="h-12 w-full mb-4 bg-accent/50" />
-                        {
-                            Array.from({ length: 20 }, (_, index) => (
-                                <Skeleton
-                                    key={index}
-                                    className="h-10 w-full mb-2 bg-accent/40"
-                                />
-                            ))
-                        }
+                        {Array.from({ length: 20 }, (_, index) => (
+                            <Skeleton
+                                key={index}
+                                className="h-10 w-full mb-2 bg-accent/40"
+                            />
+                        ))}
                     </div>
                 </div>
             ) : (
@@ -495,6 +639,8 @@ const Overview = () => {
                     <DataTable columns={columns} records={records || []} />
                 </div>
             )}
+
+            <Stats loading={loading} stats={stats} />
         </div>
     );
 };

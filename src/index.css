@@ -124,6 +124,15 @@
   }
 }
 
+@layer components {
+    .form input{
+        @apply border-0 outline-none max-w-[160px];
+    }
+    .form {
+        @apply px-2 py-1
+    }
+}
+
 .glass{
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
     backdrop-filter: blur(10px);
