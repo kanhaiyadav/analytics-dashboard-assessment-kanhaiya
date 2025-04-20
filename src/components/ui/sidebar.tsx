@@ -31,7 +31,7 @@ const Sidebar = ({
     };
 
     return (
-        <div className="h-[40px] sm:h-full mb-2 flex flex-row-reverse sm:flex-col justify-between sm:justify-start gap-8 items-center border-r-2 border-muted z-[1000]">
+        <div className="fixed sm:static bottom-0 bg-[#251d34] w-full sm:w-fit h-[60px] sm:h-full mb-0 sm:mb-0 flex flex-row-reverse sm:flex-col justify-between sm:justify-start gap-8 items-center border-r-2 border-muted z-[1000] shadow-[0_0_10px_0_rgba(0,0,0,0.7)]">
             <Dialog>
                 <DialogTrigger>
                     <div className="p-4">

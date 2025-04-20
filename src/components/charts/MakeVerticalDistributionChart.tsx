@@ -40,7 +40,7 @@ export function MakeVerticalDistributionChart({
 
     return (
         <div className="flex flex-col gap-3 grow">
-            <h2 className="font-semibold">Top Manufacturers</h2>
+            <h2 className="font-semibold">EV Distribution by Top Manufacturers</h2>
             <div className="flex flex-col gap-4 aspect-[16/10.5] w-full max-w-[450px] glass p-2 sm:p-4">
                 {loading ? (
                     <div className="h-full flex items-center justify-center relative w-[420px]">

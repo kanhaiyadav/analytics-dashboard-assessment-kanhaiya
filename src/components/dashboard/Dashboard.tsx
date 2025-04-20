@@ -13,7 +13,7 @@ export function Dashboard() {
     const { loading, analytics } = useEVDashboard();
 
     return (
-        <div className="grow h-full overflow-y-auto">
+        <div className="grow min-h-0 sm:h-full overflow-y-auto">
             <div className="space-y-6 w-full h-fit p-4 sm:pl-0">
                 <div className="grid gap-2 sm:gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     <StatsCard
@@ -33,7 +33,7 @@ export function Dashboard() {
                         loading={loading}
                     />
                     <StatsCard
-                        title="BEV Range"
+                        title="Avg. BEV Range"
                         value={`${analytics.vehicleTypeRangeComparison?.bev} miles`}
                         icon={
                             <BoltIcon className="text-xl text-muted-foreground" />
@@ -52,7 +52,7 @@ export function Dashboard() {
 
                 <div className="flex flex-col sm:flex-row w-full gap-4">
                     <MakeDistributionChart
-                        title="County Distribution"
+                        title="EV Vehicle Distribution by County"
                         data={analytics.countyDistribution?.slice(0, 7) || []}
                         xDataKey="county"
                         yDataKey="count"
@@ -66,7 +66,7 @@ export function Dashboard() {
                         loading={loading}
                     />
                     <MakeDistributionChart
-                        title="Battery Range Distribution"
+                        title="EV Distribution by Battery Range"
                         data={analytics.rangeDistribution || []}
                         xDataKey="range"
                         yDataKey="count"
@@ -82,7 +82,7 @@ export function Dashboard() {
                         data={analytics.vehicleTypeData || []}
                         nameKey="name"
                         dataKey="value"
-                        title="Vehicle Type Distribution"
+                        title="EV Distribution by Vehicle Type"
                         formatter={(value) => `Count: ${value} vehicles`}
                         labelFormatter={(label) => `Vehicle Type: ${label}`}
                         loading={loading}
@@ -91,7 +91,7 @@ export function Dashboard() {
                         data={analytics.modelDistribution || []}
                         nameKey="name"
                         dataKey="value"
-                        title="Make-model Distribution"
+                        title="EV Distribution by Make and model"
                         formatter={(value) => `Count: ${value} vehicles`}
                         labelFormatter={(label) => `${label}`}
                         loading={loading}
@@ -100,7 +100,7 @@ export function Dashboard() {
                         data={analytics.cafvDistribution || []}
                         nameKey="status"
                         dataKey="count"
-                        title="csfv Distribution"
+                        title="EV Distribution by csfv Eligibility"
                         formatter={(value) => `Count: ${value} vehicles`}
                         labelFormatter={(label) => `Status: ${label}`}
                         loading={loading}
@@ -109,7 +109,7 @@ export function Dashboard() {
                         data={analytics.utilityDistribution || []}
                         nameKey="utility"
                         dataKey="count"
-                        title="Utility Distribution"
+                        title="EV Distribution by Utility Provider"
                         formatter={(value) => `Count: ${value} vehicles`}
                         labelFormatter={(label) => `Utility: ${label}`}
                         loading={loading}
@@ -119,14 +119,14 @@ export function Dashboard() {
                 <div className="flex flex-col sm:flex-row gap-6">
                     <MakeMultipleBarChart
                         data={analytics.vehicleTypeRangeDistribution || []}
-                        title="Vehicle Type Range Comparison"
+                        title="Vehicle Type - Range Comparison"
                         dataKey1="bev"
                         dataKey2="phev"
                         nameKey="range"
                     />
                     <StackedAreaChart
                         data={analytics.vehicleTypeYearDistribution || []}
-                        title="Vehicle Type Year Distribution"
+                        title="Adoption trend for BEV and PHEV"
                         dataKey1="bev"
                         dataKey2="phev"
                         nameKey="year"
@@ -135,7 +135,7 @@ export function Dashboard() {
                 <div className="flex">
                     <MakeMultipleBarChart
                         data={analytics.utilityVehicleTypeDistribution || []}
-                        title="Vehicle Type Range Comparison"
+                        title="Vehicle Type - Range Comparison"
                         dataKey1="bev"
                         dataKey2="phev"
                         nameKey="name"

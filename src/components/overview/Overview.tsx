@@ -623,19 +623,19 @@ const Overview = () => {
                 </button>
             </div>
             {loading ? (
-                <div className="max-h-[60vh] overflow-y-auto w-full overflow-x-auto styled-scrollbar">
+                <div className="max-h-[60vh] overflow-y-auto w-full overflow-x-auto styled-scrollbar px-4 sm:px-0">
                     <div className="flex flex-col gap-1 w-full">
-                        <Skeleton className="h-12 w-full mb-4 bg-accent/50" />
+                        <Skeleton className="h-12 w-full mb-1 sm:mb-3 bg-accent/50" />
                         {Array.from({ length: 20 }, (_, index) => (
                             <Skeleton
                                 key={index}
-                                className="h-10 w-full mb-2 bg-accent/40"
+                                className="h-10 w-full sm:mb-1 bg-accent/40"
                             />
                         ))}
                     </div>
                 </div>
             ) : (
-                <div className="max-h-[60vh] overflow-y-auto w-full overflow-x-auto styled-scrollbar">
+                <div className="max-h-[60vh] overflow-y-auto w-full overflow-x-auto styled-scrollbar px-4 sm:px-0">
                     <DataTable columns={columns} records={records || []} />
                 </div>
             )}
