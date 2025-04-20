@@ -1,4 +1,4 @@
-import { SquareKanban, LayoutDashboard, Settings } from "lucide-react";
+import { SquareKanban, LayoutDashboard } from "lucide-react";
 import {
     Dialog,
     DialogContent,
@@ -16,11 +16,7 @@ const sidebarItems = [
     {
         label: "Overview",
         icon: SquareKanban,
-    },
-    {
-        label: "Settings",
-        icon: Settings,
-    },
+    }
 ];
 
 const Sidebar = ({
@@ -35,7 +31,7 @@ const Sidebar = ({
     };
 
     return (
-        <div className="flex flex-col gap-8 items-center border-r-2 border-muted  z-[1000]">
+        <div className="h-[40px] sm:h-full mb-2 flex flex-row-reverse sm:flex-col justify-between sm:justify-start gap-8 items-center border-r-2 border-muted z-[1000]">
             <Dialog>
                 <DialogTrigger>
                     <div className="p-4">
@@ -98,11 +94,11 @@ const Sidebar = ({
                     </DialogHeader>
                 </DialogContent>
             </Dialog>
-            <div className="p-2 flex flex-col gap-3">
+            <div className="px-2 sm:p-2 flex flex-row sm:flex-col gap-3">
                 {sidebarItems.map((item, index) => (
                     <div
                         key={index}
-                        className={`p-3 hover:bg-accent w-fit rounded-lg relative group ${
+                        className={`p-2 sm:p-3 hover:bg-accent w-fit rounded-lg relative group ${
                             index === active ? "bg-accent" : ""
                         }`}
                         onClick={() => handleClick(index)}

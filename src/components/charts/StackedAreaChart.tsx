@@ -1,3 +1,5 @@
+import { useMediaQuery } from "usehooks-ts";
+
 import { Area, AreaChart, XAxis, YAxis } from "recharts";
 import {
     ChartConfig,
@@ -32,10 +34,13 @@ export function StackedAreaChart({
     dataKey2,
     nameKey,
 }: StackedAreaChartProps) {
+
+    const isSmallScreen = useMediaQuery("(max-width: 640px)");
+    
     return (
         <div className="flex flex-col gap-3 grow">
             <h2 className="font-semibold">{title}</h2>
-            <div className="flex flex-col gap-4 h-[330px] w-full glass p-2">
+            <div className="flex flex-col gap-4 aspect-video glass p-2">
                 <ChartContainer config={chartConfig} className="h-full w-full">
                     <AreaChart
                         accessibilityLayer
@@ -51,7 +56,11 @@ export function StackedAreaChart({
                             axisLine={true}
                             tickMargin={8}
                         />
-                        <YAxis width={40} />
+                        {isSmallScreen ? (
+                            <YAxis width={25} />
+                        ) : (
+                            <YAxis width={40} />
+                        )}
                         <ChartTooltip
                             cursor={false}
                             content={

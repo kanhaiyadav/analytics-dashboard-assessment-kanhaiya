@@ -1,3 +1,5 @@
+import { useMediaQuery } from "usehooks-ts";
+
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 import {
     ChartConfig,
@@ -19,7 +21,6 @@ export function MakeVerticalDistributionChart({
     data,
     loading,
 }: MakeDistributionChartProps) {
-
     const chartData = data.map((item) => ({
         name: item.name,
         value: item.value,
@@ -35,10 +36,12 @@ export function MakeVerticalDistributionChart({
         return config;
     }, {} as ChartConfig);
 
+    const isSmallScreen = useMediaQuery("(max-width: 640px)");
+
     return (
         <div className="flex flex-col gap-3 grow">
             <h2 className="font-semibold">Top Manufacturers</h2>
-            <div className="flex flex-col gap-4 h-[300px] w-full max-w-[450px] glass p-4">
+            <div className="flex flex-col gap-4 aspect-[16/10.5] w-full max-w-[450px] glass p-2 sm:p-4">
                 {loading ? (
                     <div className="h-full flex items-center justify-center relative w-[420px]">
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-foreground/10 rounded-full animate-ping"></div>
@@ -58,19 +61,34 @@ export function MakeVerticalDistributionChart({
                                 left: 0,
                             }}
                         >
-                            <YAxis
-                                dataKey="name"
-                                type="category"
-                                tickLine={false}
-                                width={80}
-                                tickMargin={10}
-                                axisLine={false}
-                                tickFormatter={(value) =>
-                                    chartConfig[
-                                        value as keyof typeof chartConfig
-                                    ]?.label?.toString() || value.toString()
-                                }
-                            />
+                            {isSmallScreen ? (
+                                <YAxis
+                                    dataKey="name"
+                                    type="category"
+                                    tickLine={false}
+                                    width={70}
+                                    axisLine={false}
+                                    tickFormatter={(value) =>
+                                        chartConfig[
+                                            value as keyof typeof chartConfig
+                                        ]?.label?.toString() || value.toString()
+                                    }
+                                />
+                            ) : (
+                                <YAxis
+                                    dataKey="name"
+                                    type="category"
+                                    tickLine={false}
+                                    width={80}
+                                    tickMargin={10}
+                                    axisLine={false}
+                                    tickFormatter={(value) =>
+                                        chartConfig[
+                                            value as keyof typeof chartConfig
+                                        ]?.label?.toString() || value.toString()
+                                    }
+                                />
+                            )}
                             <XAxis dataKey="value" type="number" hide />
                             <ChartTooltip
                                 cursor={false}

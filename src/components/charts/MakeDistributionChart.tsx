@@ -1,3 +1,13 @@
+import { Bar, BarChart, LabelList, XAxis, YAxis } from "recharts";
+import { useMediaQuery } from "usehooks-ts";
+import {
+    ChartConfig,
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+} from "@/components/ui/chart";
+
+
 interface MakeDistributionChartProps {
     data: Array<{
         label: string;
@@ -10,14 +20,6 @@ interface MakeDistributionChartProps {
     title: string;
     loading: boolean;
 }
-
-import { Bar, BarChart, LabelList, XAxis, YAxis } from "recharts";
-import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from "@/components/ui/chart";
 
 export function MakeDistributionChart({
     data,
@@ -37,11 +39,12 @@ export function MakeDistributionChart({
         return config;
     }, {} as ChartConfig);
 
+    const isSmallScreen = useMediaQuery("(max-width: 640px)");
 
     return (
-        <div className="flex flex-col gap-3 grow">
+        <div className="flex flex-col gap-3 grow shrink">
             <h2 className="font-semibold">{title}</h2>
-            <div className="flex flex-col gap-4 h-[300px] w-full max-w-[450px] glass p-4">
+            <div className="flex flex-col gap-4 aspect-[16/10.5] w-full max-w-[450px] glass p-2 sm:p-4">
                 {loading ? (
                     <div className="h-full flex items-center justify-center relative w-[420px]">
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-foreground/10 rounded-full animate-ping"></div>
@@ -54,14 +57,27 @@ export function MakeDistributionChart({
                         className="h-full w-full"
                     >
                         <BarChart accessibilityLayer data={data}>
-                            <XAxis
-                                dataKey={xDataKey}
-                                tickLine={false}
-                                tickMargin={5}
-                                axisLine={true}
-                                interval={interval}
-                            />
-                            <YAxis width={40} />
+                            {isSmallScreen ? (
+                                <XAxis
+                                    dataKey={xDataKey}
+                                    tickLine={false}
+                                        axisLine={false}
+                                        hide={true}
+                                />
+                            ) : (
+                                <XAxis
+                                    dataKey={xDataKey}
+                                    tickLine={false}
+                                    tickMargin={5}
+                                    axisLine={true}
+                                    interval={interval}
+                                />
+                            )}
+                            {isSmallScreen ? (
+                                <YAxis width={30} tickLine={false} />
+                            ) : (
+                                <YAxis width={40} tickLine={false} />
+                            )}
                             <ChartTooltip
                                 cursor={false}
                                 content={

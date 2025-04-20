@@ -40,7 +40,7 @@ export function MakePieChart({
     return (
         <div className="flex flex-col gap-3">
             <h2 className="font-semibold">{title}</h2>
-            <div className="flex flex-col gap-4 h-[330px] w-fit glass">
+            <div className="flex flex-col gap-4 aspect-[14/15] w-full glass">
                 {loading ? (
                     <div className="h-full flex items-center justify-center relative w-[328px]">
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-foreground/10 rounded-full animate-ping"></div>

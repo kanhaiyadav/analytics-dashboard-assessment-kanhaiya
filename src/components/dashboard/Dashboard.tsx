@@ -14,8 +14,8 @@ export function Dashboard() {
 
     return (
         <div className="grow h-full overflow-y-auto">
-            <div className="space-y-6 w-full h-fit p-4 pl-0">
-                <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4">
+            <div className="space-y-6 w-full h-fit p-4 sm:pl-0">
+                <div className="grid gap-2 sm:gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     <StatsCard
                         title="Total EVs"
                         value={`${analytics.totalVehicles}`}
@@ -50,7 +50,7 @@ export function Dashboard() {
                     />
                 </div>
 
-                <div className="flex w-full gap-4">
+                <div className="flex flex-col sm:flex-row w-full gap-4">
                     <MakeDistributionChart
                         title="County Distribution"
                         data={analytics.countyDistribution?.slice(0, 7) || []}
@@ -116,7 +116,7 @@ export function Dashboard() {
                     />
                 </div>
 
-                <div className="flex gap-6">
+                <div className="flex flex-col sm:flex-row gap-6">
                     <MakeMultipleBarChart
                         data={analytics.vehicleTypeRangeDistribution || []}
                         title="Vehicle Type Range Comparison"
