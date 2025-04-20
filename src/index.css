@@ -126,7 +126,7 @@
 
 @layer components {
     .form input{
-        @apply border-0 outline-none max-w-[160px];
+        @apply border-0 outline-none max-w-[120px] sm:max-w-[160px];
     }
     .form {
         @apply px-2 py-1

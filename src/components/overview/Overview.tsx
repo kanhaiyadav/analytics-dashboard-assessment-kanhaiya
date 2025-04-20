@@ -549,7 +549,7 @@ const Overview = () => {
     }, [filter, analytics]);
 
     return (
-        <div className="p-8 grow min-w-0">
+        <div className="p-2 pt-8 sm:p-8 grow min-w-0">
             <div className="flex flex-wrap justify-center items-center gap-4 w-full mb-8">
                 {dropdowns.map((dropdown) => (
                     <SelectColumn
