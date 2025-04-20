@@ -93,9 +93,9 @@ export function useEVAnalytics(data: EVData[]) {
         const averageRange =
             validRangeData.length > 0
                 ? validRangeData.reduce(
-                    (sum, vehicle) => sum + vehicle.range,
-                    0
-                ) / validRangeData.length
+                      (sum, vehicle) => sum + vehicle.range,
+                      0
+                  ) / validRangeData.length
                 : 0;
 
         const rangeBuckets = [0, 50, 100, 150, 200, 250, 300, 350, 400];
@@ -231,8 +231,6 @@ export function useEVAnalytics(data: EVData[]) {
             })
         );
 
-
-
         interface MakeStats {
             [make: string]: {
                 make: string;
@@ -242,7 +240,7 @@ export function useEVAnalytics(data: EVData[]) {
                 eligibilityRate: number;
             };
         }
-        
+
         const makeStats: MakeStats = {};
         data.forEach((vehicle) => {
             const make = vehicle.Make;
@@ -264,8 +262,7 @@ export function useEVAnalytics(data: EVData[]) {
                 eligibilityStatus === "Clean Alternative Fuel Vehicle Eligible"
             ) {
                 makeStats[make].eligibleCount += 1;
-            }
-            else {
+            } else {
                 makeStats[make].nonEligibleCount += 1;
             }
         });
@@ -278,9 +275,9 @@ export function useEVAnalytics(data: EVData[]) {
             return makeStat;
         });
 
-        const cafvDistributionByMake =  result.sort((a, b) => b.eligibilityRate - a.eligibilityRate);
-        
-        
+        const cafvDistributionByMake = result.sort(
+            (a, b) => b.eligibilityRate - a.eligibilityRate
+        );
 
         const countyData = data.reduce((acc, vehicle) => {
             const county = vehicle.County;
@@ -322,9 +319,6 @@ export function useEVAnalytics(data: EVData[]) {
                 fill: `var(--chart-${(index % 8) + 1})`,
             }))
             .sort((a, b) => b.count - a.count);
-        
-        
-        
 
         interface UtilityVehicleCount {
             name: string;
@@ -332,7 +326,7 @@ export function useEVAnalytics(data: EVData[]) {
             bev: number;
             phev: number;
         }
-        
+
         const utilityVehicleTypeDistribution: UtilityVehicleCount[] = [];
 
         data.forEach((vehicle) => {
@@ -344,10 +338,17 @@ export function useEVAnalytics(data: EVData[]) {
             utilities.forEach((utility) => {
                 if (!utility) return;
 
-                let utilityObj = utilityVehicleTypeDistribution.find((item) => item.name === utility);
+                let utilityObj = utilityVehicleTypeDistribution.find(
+                    (item) => item.name === utility
+                );
 
                 if (!utilityObj) {
-                    utilityObj = { name: utility, label:utility, bev: 0, phev: 0 };
+                    utilityObj = {
+                        name: utility,
+                        label: utility,
+                        bev: 0,
+                        phev: 0,
+                    };
                     utilityVehicleTypeDistribution.push(utilityObj);
                 }
 
@@ -360,8 +361,6 @@ export function useEVAnalytics(data: EVData[]) {
                 }
             });
         });
-
-        
 
         const makeModelYearData = data.reduce((acc, vehicle) => {
             const make = vehicle.Make;

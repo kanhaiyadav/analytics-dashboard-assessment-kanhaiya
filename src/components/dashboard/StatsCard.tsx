@@ -4,10 +4,12 @@ const StatsCard = ({
     title,
     value,
     icon,
+    loading,
 }: {
     title: string;
     value: string;
     icon: React.ReactElement;
+    loading: boolean;
 }) => {
     return (
         <div>
@@ -15,9 +17,15 @@ const StatsCard = ({
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-2">
                         {icon}
-                        <h3 className="text-lg font-semibold text-muted-foreground">{title}</h3>
+                        <h3 className="text-lg font-semibold text-muted-foreground">
+                            {title}
+                        </h3>
                     </div>
-                    <p className="font-semibold text-3xl">{value}</p>
+                    {loading ? (
+                        <p className="font-semibold text-3xl text-muted-foreground">Calculating...</p>
+                    ) : (
+                        <p className="font-semibold text-3xl">{value}</p>
+                    )}
                 </div>
             </div>
         </div>

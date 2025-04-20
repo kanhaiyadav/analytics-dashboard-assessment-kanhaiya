@@ -1,45 +1,16 @@
-// src/components/dashboard/Dashboard.tsx
-// import { FactoryIcon } from "lucide-react";
 import { useEVDashboard } from "../../hooks/useEVDashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Skeleton } from "../ui/skeleton";
 import { MakePieChart } from "../charts/MakePieChart";
 import { MakeDistributionChart } from "../charts/MakeDistributionChart";
 import { MakeVerticalDistributionChart } from "../charts/MakeVerticalDistributionChart";
 import StatsCard from "./StatsCard";
 import { BatteryIcon, BoltIcon, CarIcon, FactoryIcon } from "lucide-react";
-// import { YearTrendChart } from "../charts/YearTrendChart";
 import { MakeMultipleBarChart } from "../charts/MakeMultipleBarChart";
 import { StackedAreaChart } from "../charts/StackedAreaChart";
 import { StackedBarChart } from "../charts/StackedBarChart";
-// Import your chart components
 
 export function Dashboard() {
-    const { loading, error, analytics, isReady } = useEVDashboard();
-
-    if (loading) {
-        return (
-            <div className="grid gap-4 md:grid-cols-2">
-                {Array(6)
-                    .fill(0)
-                    .map((_, i) => (
-                        <Skeleton key={i} className="h-[300px] rounded-lg" />
-                    ))}
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="p-4 text-red-500 bg-red-50 rounded-lg">
-                Error loading EV data. Please try again later.
-            </div>
-        );
-    }
-
-    if (!isReady) {
-        return <div>Processing data...</div>;
-    }
+    const { loading, analytics } = useEVDashboard();
 
     return (
         <div className="grow h-full overflow-y-auto">
@@ -51,6 +22,7 @@ export function Dashboard() {
                         icon={
                             <CarIcon className="text-xl text-muted-foreground" />
                         }
+                        loading={loading}
                     />
                     <StatsCard
                         title="Average Range"
@@ -58,6 +30,7 @@ export function Dashboard() {
                         icon={
                             <BatteryIcon className="text-xl text-muted-foreground" />
                         }
+                        loading={loading}
                     />
                     <StatsCard
                         title="BEV Range"
@@ -65,6 +38,7 @@ export function Dashboard() {
                         icon={
                             <BoltIcon className="text-xl text-muted-foreground" />
                         }
+                        loading={loading}
                     />
                     <StatsCard
                         title="Top Manufacturer"
@@ -72,10 +46,11 @@ export function Dashboard() {
                         icon={
                             <FactoryIcon className="text-xl text-muted-foreground" />
                         }
+                        loading={loading}
                     />
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-3">
+                <div className="flex w-full gap-4">
                     <MakeDistributionChart
                         title="County Distribution"
                         data={analytics.countyDistribution?.slice(0, 7) || []}
@@ -84,9 +59,11 @@ export function Dashboard() {
                         formatter={(value) => `${value} vehicles`}
                         labelFormatter={(label) => `County: ${label}`}
                         interval={0}
+                        loading={loading}
                     />
                     <MakeVerticalDistributionChart
                         data={analytics.makeDistribution?.slice(0, 10) || []}
+                        loading={loading}
                     />
                     <MakeDistributionChart
                         title="Battery Range Distribution"
@@ -96,6 +73,7 @@ export function Dashboard() {
                         formatter={(value) => `${value} vehicles`}
                         interval={1}
                         labelFormatter={(label) => `Range: ${label} miles`}
+                        loading={loading}
                     />
                 </div>
 
@@ -107,6 +85,7 @@ export function Dashboard() {
                         title="Vehicle Type Distribution"
                         formatter={(value) => `Count: ${value} vehicles`}
                         labelFormatter={(label) => `Vehicle Type: ${label}`}
+                        loading={loading}
                     />
                     <MakePieChart
                         data={analytics.modelDistribution || []}
@@ -115,6 +94,7 @@ export function Dashboard() {
                         title="Make-model Distribution"
                         formatter={(value) => `Count: ${value} vehicles`}
                         labelFormatter={(label) => `${label}`}
+                        loading={loading}
                     />
                     <MakePieChart
                         data={analytics.cafvDistribution || []}
@@ -123,6 +103,7 @@ export function Dashboard() {
                         title="csfv Distribution"
                         formatter={(value) => `Count: ${value} vehicles`}
                         labelFormatter={(label) => `Status: ${label}`}
+                        loading={loading}
                     />
                     <MakePieChart
                         data={analytics.utilityDistribution || []}
@@ -131,6 +112,7 @@ export function Dashboard() {
                         title="Utility Distribution"
                         formatter={(value) => `Count: ${value} vehicles`}
                         labelFormatter={(label) => `Utility: ${label}`}
+                        loading={loading}
                     />
                 </div>
 
@@ -168,8 +150,7 @@ export function Dashboard() {
                     />
                 </div>
 
-                {/* Key Insights */}
-                <Card>
+                <Card className="glass text-foreground">
                     <CardHeader>
                         <CardTitle>Key Insights</CardTitle>
                     </CardHeader>
@@ -177,7 +158,7 @@ export function Dashboard() {
                         <ul className="space-y-2">
                             {analytics.keyInsights?.map((insight, index) => (
                                 <li key={index} className="flex items-start">
-                                    <span className="mr-2 mt-1 text-primary">
+                                    <span className="mr-2 mt-1">
                                         •
                                     </span>
                                     <span>{insight}</span>
@@ -186,10 +167,6 @@ export function Dashboard() {
                         </ul>
                     </CardContent>
                 </Card>
-
-                {/* <div className="grid gap-6 md:grid-cols-2">
-                    <YearTrendChart data={analytics.yearDistribution} />
-                </div> */}
             </div>
         </div>
     );
