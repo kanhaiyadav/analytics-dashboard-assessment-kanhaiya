@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-interface EVData {
+export interface EVData {
     "VIN (1-10)": string;
     County: string;
     City: string;
@@ -34,6 +34,7 @@ export function useEVAnalytics(data: EVData[]) {
             acc[type] = (acc[type] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
+
         const vehicleTypeData = Object.entries(vehicleTypeCounts).map(
             ([name, value], index) => ({
                 label: name,
@@ -43,8 +44,6 @@ export function useEVAnalytics(data: EVData[]) {
                 fill: `var(--chart-${(index % 8) + 1})`,
             })
         );
-
-
 
         const makeData = data.reduce((acc, vehicle) => {
             const make = vehicle.Make;
@@ -59,8 +58,6 @@ export function useEVAnalytics(data: EVData[]) {
                 percentage: ((value / data.length) * 100).toFixed(1) + "%",
             }))
             .sort((a, b) => b.value - a.value);
-        
-        
 
         const modelData = data.reduce((acc, vehicle) => {
             const model = `${vehicle.Make} ${vehicle.Model}`;
@@ -78,8 +75,6 @@ export function useEVAnalytics(data: EVData[]) {
             }))
             .sort((a, b) => b.value - a.value)
             .slice(0, 10);
-        
-        
 
         const validRangeData = data
             .filter(
@@ -92,17 +87,17 @@ export function useEVAnalytics(data: EVData[]) {
                 model: vehicle.Model,
                 year: parseInt(vehicle["Model Year"]),
                 range: parseInt(vehicle["Electric Range"]),
+                type: vehicle["Electric Vehicle Type"],
             }));
 
         const averageRange =
             validRangeData.length > 0
                 ? validRangeData.reduce(
-                      (sum, vehicle) => sum + vehicle.range,
-                      0
-                  ) / validRangeData.length
+                    (sum, vehicle) => sum + vehicle.range,
+                    0
+                ) / validRangeData.length
                 : 0;
-        
-        
+
         const rangeBuckets = [0, 50, 100, 150, 200, 250, 300, 350, 400];
         const rangeDistribution = rangeBuckets.reduce((acc, _, index) => {
             if (index === rangeBuckets.length - 1) return acc;
@@ -115,7 +110,7 @@ export function useEVAnalytics(data: EVData[]) {
 
             acc.push({
                 range: `${min}-${max}`,
-                label: `${min} - ${max}`,
+                label: `${min}-${max}`,
                 count,
                 percentage:
                     ((count / validRangeData.length) * 100).toFixed(1) + "%",
@@ -123,11 +118,46 @@ export function useEVAnalytics(data: EVData[]) {
             });
 
             return acc;
-        }, [] as Array<{ range: string; label: string; count: number; percentage: string, fill: string}>);
+        }, [] as Array<{ range: string; label: string; count: number; percentage: string; fill: string }>);
 
+        const vehicleTypeRangeDistribution = rangeBuckets.reduce(
+            (acc, _, index) => {
+                if (index === rangeBuckets.length - 1) return acc;
 
-        
-        
+                const min = rangeBuckets[index];
+                const max = rangeBuckets[index + 1];
+                const bev = validRangeData.filter(
+                    (v) =>
+                        v.range >= min &&
+                        v.range < max &&
+                        v.type.includes("Battery Electric")
+                ).length;
+                const phev = validRangeData.filter(
+                    (v) =>
+                        v.range >= min &&
+                        v.range < max &&
+                        v.type.includes("Plug-in Hybrid")
+                ).length;
+
+                acc.push({
+                    range: `${min}-${max}`,
+                    label: `${min}-${max}`,
+                    bev,
+                    phev,
+                    count: bev + phev,
+                });
+
+                return acc;
+            },
+            [] as Array<{
+                range: string;
+                label: string;
+                bev: number;
+                phev: number;
+                count: number;
+            }>
+        );
+
         const yearData = data.reduce((acc, vehicle) => {
             const year = vehicle["Model Year"];
             if (year && !isNaN(parseInt(year))) {
@@ -144,10 +174,46 @@ export function useEVAnalytics(data: EVData[]) {
             }))
             .sort((a, b) => a.year - b.year);
 
-            
-            
-            
-            
+        const yearBuckets = [
+            2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
+            2021, 2022, 2023, 2024,
+        ];
+        const vehicleTypeYearDistribution = yearBuckets.reduce(
+            (acc, _, index) => {
+                if (index === rangeBuckets.length - 1) return acc;
+
+                const year = yearBuckets[index];
+                const bev = data.filter(
+                    (v) =>
+                        v["Model Year"] === year.toString() &&
+                        v["Electric Vehicle Type"].includes("Battery Electric")
+                ).length;
+                const phev = data.filter(
+                    (v) =>
+                        v["Model Year"] &&
+                        v["Electric Vehicle Type"].includes("Plug-in Hybrid")
+                ).length;
+
+                acc.push({
+                    year: year.toString(),
+                    label: year.toString(),
+                    bev,
+                    phev,
+                    count: bev + phev,
+                });
+
+                return acc;
+            },
+            [] as Array<{
+                year: string;
+                label: string;
+                bev: number;
+                phev: number;
+                count: number;
+            }>
+        );
+        console.log("vehicleTypeYearDistribution", vehicleTypeYearDistribution);
+
         const cafvData = data.reduce((acc, vehicle) => {
             const status =
                 vehicle["Clean Alternative Fuel Vehicle (CAFV) Eligibility"];
@@ -166,9 +232,56 @@ export function useEVAnalytics(data: EVData[]) {
         );
 
 
+
+        interface MakeStats {
+            [make: string]: {
+                make: string;
+                eligibleCount: number;
+                nonEligibleCount: number;
+                totalCount: number;
+                eligibilityRate: number;
+            };
+        }
+        
+        const makeStats: MakeStats = {};
+        data.forEach((vehicle) => {
+            const make = vehicle.Make;
+            const eligibilityStatus =
+                vehicle["Clean Alternative Fuel Vehicle (CAFV) Eligibility"];
+
+            if (!makeStats[make]) {
+                makeStats[make] = {
+                    make,
+                    eligibleCount: 0,
+                    nonEligibleCount: 0,
+                    totalCount: 0,
+                    eligibilityRate: 0,
+                };
+            }
+
+            makeStats[make].totalCount += 1;
+            if (
+                eligibilityStatus === "Clean Alternative Fuel Vehicle Eligible"
+            ) {
+                makeStats[make].eligibleCount += 1;
+            }
+            else {
+                makeStats[make].nonEligibleCount += 1;
+            }
+        });
+
+        const result = Object.values(makeStats).map((makeStat) => {
+            makeStat.eligibilityRate =
+                makeStat.totalCount > 0
+                    ? makeStat.eligibleCount / makeStat.totalCount
+                    : 0;
+            return makeStat;
+        });
+
+        const cafvDistributionByMake =  result.sort((a, b) => b.eligibilityRate - a.eligibilityRate);
         
         
-        
+
         const countyData = data.reduce((acc, vehicle) => {
             const county = vehicle.County;
             acc[county] = (acc[county] || 0) + 1;
@@ -178,17 +291,12 @@ export function useEVAnalytics(data: EVData[]) {
         const countyDistribution = Object.entries(countyData)
             .map(([county, count], index) => ({
                 county,
-                label: 'county',
+                label: "county",
                 count,
                 percentage: ((count / data.length) * 100).toFixed(1) + "%",
                 fill: `var(--chart-${(index % 8) + 1})`,
             }))
             .sort((a, b) => b.count - a.count);
-
-
-            
-            
-            
 
         const utilityData = data.reduce((acc, vehicle) => {
             const utilities = vehicle["Electric Utility"]?.split("|") || [
@@ -217,7 +325,42 @@ export function useEVAnalytics(data: EVData[]) {
         
         
         
+
+        interface UtilityVehicleCount {
+            name: string;
+            label: string;
+            bev: number;
+            phev: number;
+        }
         
+        const utilityVehicleTypeDistribution: UtilityVehicleCount[] = [];
+
+        data.forEach((vehicle) => {
+            const utilities = vehicle["Electric Utility"]
+                .split(/\|+/)
+                .map((util) => util.trim());
+            const vehicleType = vehicle["Electric Vehicle Type"];
+
+            utilities.forEach((utility) => {
+                if (!utility) return;
+
+                let utilityObj = utilityVehicleTypeDistribution.find((item) => item.name === utility);
+
+                if (!utilityObj) {
+                    utilityObj = { name: utility, label:utility, bev: 0, phev: 0 };
+                    utilityVehicleTypeDistribution.push(utilityObj);
+                }
+
+                if (vehicleType === "Battery Electric Vehicle (BEV)") {
+                    utilityObj.bev += 1;
+                } else if (
+                    vehicleType === "Plug-in Hybrid Electric Vehicle (PHEV)"
+                ) {
+                    utilityObj.phev += 1;
+                }
+            });
+        });
+
         
 
         const makeModelYearData = data.reduce((acc, vehicle) => {
@@ -249,11 +392,6 @@ export function useEVAnalytics(data: EVData[]) {
             }))
             .sort((a, b) => b.averageRange - a.averageRange);
 
-
-            
-            
-            
-            
         const bevs = validRangeData.filter((v) =>
             data.find(
                 (d) =>
@@ -280,9 +418,6 @@ export function useEVAnalytics(data: EVData[]) {
             ? phevs.reduce((sum, v) => sum + v.range, 0) / phevs.length
             : 0;
 
-
-            
-            
         const keyInsights = [
             `${
                 makeDistribution[0]?.name || "Unknown"
@@ -315,8 +450,6 @@ export function useEVAnalytics(data: EVData[]) {
             }.`,
         ];
 
-        
-        
         return {
             isReady: true,
             totalVehicles: data.length,
@@ -324,11 +457,15 @@ export function useEVAnalytics(data: EVData[]) {
             makeDistribution,
             modelDistribution,
             rangeDistribution,
+            vehicleTypeRangeDistribution,
             averageRange: Math.round(averageRange),
             yearDistribution,
+            vehicleTypeYearDistribution,
             cafvDistribution,
+            cafvDistributionByMake,
             countyDistribution,
             utilityDistribution,
+            utilityVehicleTypeDistribution,
             makeModelYearData,
             averageRangeByMake,
             vehicleTypeRangeComparison: {

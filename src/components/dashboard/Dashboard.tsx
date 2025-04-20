@@ -1,12 +1,18 @@
+// src/components/dashboard/Dashboard.tsx
+// import { FactoryIcon } from "lucide-react";
 import { useEVDashboard } from "../../hooks/useEVDashboard";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 import { MakePieChart } from "../charts/MakePieChart";
 import { MakeDistributionChart } from "../charts/MakeDistributionChart";
 import { MakeVerticalDistributionChart } from "../charts/MakeVerticalDistributionChart";
 import StatsCard from "./StatsCard";
 import { BatteryIcon, BoltIcon, CarIcon, FactoryIcon } from "lucide-react";
+// import { YearTrendChart } from "../charts/YearTrendChart";
 import { MakeMultipleBarChart } from "../charts/MakeMultipleBarChart";
 import { StackedAreaChart } from "../charts/StackedAreaChart";
+import { StackedBarChart } from "../charts/StackedBarChart";
+// Import your chart components
 
 export function Dashboard() {
     const { loading, error, analytics, isReady } = useEVDashboard();
@@ -144,6 +150,46 @@ export function Dashboard() {
                         nameKey="year"
                     />
                 </div>
+                <div className="flex">
+                    <MakeMultipleBarChart
+                        data={analytics.utilityVehicleTypeDistribution || []}
+                        title="Vehicle Type Range Comparison"
+                        dataKey1="bev"
+                        dataKey2="phev"
+                        nameKey="name"
+                        color1="var(--chart-1)"
+                        color2="var(--chart-8)"
+                    />
+                </div>
+
+                <div className="flex">
+                    <StackedBarChart
+                        data={analytics.cafvDistributionByMake || []}
+                    />
+                </div>
+
+                {/* Key Insights */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Key Insights</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ul className="space-y-2">
+                            {analytics.keyInsights?.map((insight, index) => (
+                                <li key={index} className="flex items-start">
+                                    <span className="mr-2 mt-1 text-primary">
+                                        •
+                                    </span>
+                                    <span>{insight}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </CardContent>
+                </Card>
+
+                {/* <div className="grid gap-6 md:grid-cols-2">
+                    <YearTrendChart data={analytics.yearDistribution} />
+                </div> */}
             </div>
         </div>
     );
