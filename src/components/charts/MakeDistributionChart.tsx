@@ -37,7 +37,6 @@ export function MakeDistributionChart({
         return config;
     }, {} as ChartConfig);
 
-    console.log("RangeDistributionChart data", data);
 
     return (
         <div className="flex flex-col gap-3 grow">

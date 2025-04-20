@@ -140,3 +140,8 @@
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
+
+.styled-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+}

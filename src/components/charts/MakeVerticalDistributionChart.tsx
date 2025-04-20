@@ -19,7 +19,6 @@ export function MakeVerticalDistributionChart({
     data,
     loading,
 }: MakeDistributionChartProps) {
-    console.log("MakeDistributionChart data", data);
 
     const chartData = data.map((item) => ({
         name: item.name,

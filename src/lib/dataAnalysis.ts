@@ -212,7 +212,6 @@ export function useEVAnalytics(data: EVData[]) {
                 count: number;
             }>
         );
-        console.log("vehicleTypeYearDistribution", vehicleTypeYearDistribution);
 
         const cafvData = data.reduce((acc, vehicle) => {
             const status =
@@ -449,6 +448,101 @@ export function useEVAnalytics(data: EVData[]) {
             }.`,
         ];
 
+        interface EVFilters {
+            vin?: string;
+            county?: string;
+            city?: string;
+            make?: string;
+            model?: string;
+            electricVehicleType?: string;
+            cafvEligibility?: string;
+            rangeMin?: number;
+            rangeMax?: number;
+            electricUtility?: string;
+        }
+
+        function filterEVData(filters: EVFilters = {}) {
+            return data.filter((vehicle) => {
+
+                let matches = true;
+
+                if (filters.vin && matches) {
+                    matches = vehicle["VIN (1-10)"].includes(filters.vin);
+                }
+
+                if (filters.county && matches) {
+                    matches =
+                        vehicle.County.toLowerCase() ===
+                        filters.county.toLowerCase();
+                }
+
+                if (filters.city && matches) {
+                    matches =
+                        vehicle.City.toLowerCase() ===
+                        filters.city.toLowerCase();
+                }
+
+                if (filters.make && matches) {
+                    matches =
+                        vehicle.Make.toLowerCase() ===
+                        filters.make.toLowerCase();
+                }
+
+                if (filters.model && matches) {
+                    matches =
+                        vehicle.Model.toLowerCase() ===
+                        filters.model.toLowerCase();
+                }
+
+                if (filters.electricVehicleType && matches) {
+                    matches = vehicle["Electric Vehicle Type"].includes(
+                        filters.electricVehicleType
+                    );
+                }
+
+                if (filters.cafvEligibility && matches) {
+                    matches = vehicle[
+                        "Clean Alternative Fuel Vehicle (CAFV) Eligibility"
+                    ].includes(filters.cafvEligibility);
+                }
+
+                if (
+                    matches &&
+                    (filters.rangeMin !== undefined ||
+                        filters.rangeMax !== undefined)
+                ) {
+                    const range = parseInt(vehicle["Electric Range"]) || 0;
+
+                    if (
+                        filters.rangeMin !== undefined &&
+                        range < filters.rangeMin
+                    ) {
+                        matches = false;
+                    }
+
+                    if (
+                        filters.rangeMax !== undefined &&
+                        range > filters.rangeMax
+                    ) {
+                        matches = false;
+                    }
+                }
+
+                if (filters.electricUtility && matches) {
+                    const utilities = vehicle["Electric Utility"]
+                        .split(/\|+/)
+                        .map((util) => util.trim());
+                    matches = utilities.some((utility) =>
+                        utility
+                            .toLowerCase()
+                            .includes(filters.electricUtility?.toLowerCase() || '')
+                    );
+                }
+
+                return matches;
+            });
+        }
+
         return {
             isReady: true,
             totalVehicles: data.length,
@@ -472,6 +566,7 @@ export function useEVAnalytics(data: EVData[]) {
                 phev: Math.round(phevAvgRange),
             },
             keyInsights,
+            filterEVData,
         };
     }, [data]);
 }
